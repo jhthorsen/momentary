@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Momentary</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  {% block header %}
+  <header>
+    <div class="container">
+      <nav>
+        <ul>
+          <li><strong>Momentary</strong></li>
+          <li><a href="/">Feed</a></li>
+        </ul>
+        <ul>
+          <li><a href="/-/account">Account</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  {% endblock %}
+
+  {% block content %}<p>content missing!</p>{% endblock %}
+
+  {% block footer %}
+  <footer>
+    <div class="container">
+      <p>&copy; 2024</p>
+    </div>
+  </footer>
+  {% endblock %}
+
+  <script src="https://unpkg.com/htmx.org@1.9.6"
+    integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
+    crossorigin="anonymous"></script>
+</body>
+</html>

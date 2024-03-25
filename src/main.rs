@@ -1,11 +1,14 @@
 #[macro_use] extern crate rocket;
 
+use rocket_dyn_templates::{Template, context};
 use rusqlite::Connection;
 use std::env;
 
 #[get("/")]
-fn route_index() -> &'static str {
-    "Hello, world!"
+fn route_index() -> Template {
+    Template::render("index", context! {
+        foo: 123,
+    })
 }
 
 fn setup_database() -> Result<Connection, rusqlite::Error> {
@@ -53,7 +56,8 @@ fn main() -> Result<(), rusqlite::Error> {
         .unwrap();
 
     let rocket = rocket::build()
-        .mount("/", routes![route_index]);
+        .mount("/", routes![route_index])
+        .attach(Template::fairing());
 
     if let Err(e) = rt.block_on(rocket.launch()) {
         println!("Launch failed! Error: {}", e);

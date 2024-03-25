@@ -1,0 +1,7 @@
+{% extends "base" %}
+
+{% block content %}
+<main role="document" class="container">
+  <h1>Momentary feed</h1>
+</main>
+{% endblock %}
