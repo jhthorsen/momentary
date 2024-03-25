@@ -1,5 +1,12 @@
-use rusqlite::{Connection, Result};
+#[macro_use] extern crate rocket;
+
+use rusqlite::Connection;
 use std::env;
+
+#[get("/")]
+fn route_index() -> &'static str {
+    "Hello, world!"
+}
 
 fn setup_database() -> Result<Connection, rusqlite::Error> {
     let database_location = match env::var_os("MOMENTARY_DB") {
@@ -34,9 +41,23 @@ fn setup_database() -> Result<Connection, rusqlite::Error> {
     Ok(conn)
 }
 
-fn main() -> Result<()> {
+fn main() -> Result<(), rusqlite::Error> {
     let conn = setup_database()?;
     let n_users: i32 = conn.query_row("select count(*) from users", [], |row| row.get(0))?;
     println!("Number of users: {}", n_users);
+
+    let rt = rocket::tokio::runtime::Builder::new_multi_thread()
+        .thread_name("rocket-worker-thread")
+        .enable_all()
+        .build()
+        .unwrap();
+
+    let rocket = rocket::build()
+        .mount("/", routes![route_index]);
+
+    if let Err(e) = rt.block_on(rocket.launch()) {
+        println!("Launch failed! Error: {}", e);
+    }
+
     Ok(())
 }
