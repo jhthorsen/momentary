@@ -8,7 +8,7 @@ create table if not exists user_friends (
     tag varchar not null,
     constraint unique_momentary_tag unique (user_id, friend_id, tag)
 );
-create table if not exists momentary_tags (
+create table if not exists moment_tags (
     moment_id unsigned integer not null,
     tag varchar not null,
     constraint unique_momentary_tag unique (moment_id, tag)
