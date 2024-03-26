@@ -1,2 +1,5 @@
 [default]
 template_dir = "templates"
+
+[default.databases.moments_db]
+url = "local/momentary.db"
