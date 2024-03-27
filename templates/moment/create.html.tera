@@ -3,8 +3,5 @@
 <button>Create</button>
 
 <div hx-swap-oob="beforebegin: #feed">
-  <article
-    <p>{{ moment.content }}</p>
-    <p>By {{ moment.user_id }}</p>
-  </article>
+  {% include "moment/article" %}
 </div>

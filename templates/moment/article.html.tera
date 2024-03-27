@@ -1,0 +1,4 @@
+<article>
+  <p>{{ moment.content | tags_to_links | safe }}</p>
+  <small>By {{ moment.user_id }}</small>
+</article>

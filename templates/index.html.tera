@@ -12,10 +12,7 @@
 
   <div id="feed">
     {% for moment in moments %}
-      <article>
-        <p>{{ moment.content | tags_to_links | safe }}</p>
-        <p>By {{ moment.user_id }}</p>
-      </article>
+      {% include "moment/article" %}
     {% endfor %}
   </div>
 </main>
