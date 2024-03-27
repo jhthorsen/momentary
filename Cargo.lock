@@ -234,7 +234,9 @@ checksum = "8eaf5903dcbc0a39312feb77df2ff4c76387d591b9fc7b04a238dcf8bb62639a"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
+ "js-sys",
  "num-traits",
+ "wasm-bindgen",
  "windows-targets 0.52.4",
 ]
 
@@ -1143,6 +1145,7 @@ dependencies = [
 name = "momentary"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "regex",
  "rocket",
  "rocket_db_pools",
