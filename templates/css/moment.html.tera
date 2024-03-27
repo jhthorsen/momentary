@@ -1,0 +1,61 @@
+<style>
+html, body {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+
+  & > main {
+    flex: 1;
+  }
+}
+
+.m-container {
+  padding-inline: var(--pico-spacing);
+  margin-inline: auto;
+  width: 100%;
+  max-width: 60rem;
+}
+
+.feed-document {
+  .htmx-insert-after {
+    display: none;
+  }
+
+  @media (min-width: 50rem) {
+    display: grid;
+    grid-template-columns: 18rem 1fr;
+    gap: max(var(--pico-block-spacing-horizontal), 5vw);
+
+    h1 {
+      display: none;
+    }
+  }
+}
+
+.feed-moment {
+  header {
+    margin-inline: 0;
+    margin-block: var(--pico-block-spacing-vertical);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  header img {
+    vertical-align: bottom;
+    height: 40px;
+    border-radius: 50%;
+    margin-inline-end: 0.3em;
+  }
+
+  header time {
+    font-size: 0.8em;
+    font-style: italic;
+    float: right;
+  }
+}
+</style>

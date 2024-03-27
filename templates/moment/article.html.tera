@@ -1,4 +1,9 @@
-<article>
+{% set username = "jhthorsen" %}
+<article class="feed-moment">
+  <header>
+    <img src="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png" alt="Image of {{ username }}">
+    <b>{{ username }}</b>
+    <time datetime="{{ moment.created_at }}">{{ moment.created_at | date }}</time>
+  </header>
   <p>{{ moment.content | tags_to_links | safe }}</p>
-  <small>By {{ moment.user_id }}</small>
 </article>

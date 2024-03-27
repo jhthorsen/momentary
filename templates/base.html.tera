@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
   <title>Momentary</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.pumpkin.min.css">
+  {% include "css/moment" %}
   {% block head %}{% endblock %}
 </head>
 <body>
   {% block header %}
   <header>
-    <div class="container">
+    <div class="m-container">
       <nav>
         <ul>
           <li><strong>Momentary</strong></li>
@@ -26,7 +27,7 @@
 
   {% block footer %}
   <footer>
-    <div class="container">
+    <div class="m-container">
       <p>&copy; 2024</p>
     </div>
   </footer>

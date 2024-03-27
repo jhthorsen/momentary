@@ -1,16 +1,17 @@
 {% extends "base" %}
 
 {% block content %}
-<main role="document" class="container">
-  <h1>Momentary feed</h1>
+<main role="document" class="m-container feed-document">
   <form action="/moment" method="POST"
     hx-post="/moment" hx-target="this" hx-swap="innerHTML">
     <input type="hidden" name="user_id" value="1">
-    <textarea name="content"></textarea>
-    <button>Create</button>
+    <textarea name="content" placeholder="Today I..."></textarea>
+    <button>Post</button>
   </form>
 
   <div id="feed">
+    <h1>Feed</h1>
+    <hr class="htmx-insert-after">
     {% for moment in moments %}
       {% include "moment/article" %}
     {% endfor %}

@@ -1,7 +1,7 @@
 <input type="hidden" name="user_id" value="{{ moment.user_id }}">
-<textarea name="content">{{ moment.content }}</textarea>
-<button>Create</button>
+<textarea name="content" placeholder="Today I..."></textarea>
+<button>Post</button>
 
-<div hx-swap-oob="beforebegin: #feed">
+<div hx-swap-oob="afterend: #feed .htmx-insert-after">
   {% include "moment/article" %}
 </div>

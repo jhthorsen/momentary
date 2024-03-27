@@ -8,6 +8,7 @@ use rocket_db_pools::sqlx::Row;
 use rocket_dyn_templates::{Template, context};
 use rocket_dyn_templates::tera::{Error, Value};
 
+use chrono;
 use regex::{Captures, Regex};
 use serde::{Serialize, Deserialize};
 use serde_json::value::to_value;
@@ -21,6 +22,7 @@ struct Db(sqlx::SqlitePool);
 struct Moment {
     user_id: i32,
     content: String,
+    created_at: Option<String>,
 }
 
 fn tag_re() -> regex::Regex {
@@ -49,15 +51,19 @@ async fn route_create(mut db: Connection<Db>, moment: Form<Moment>) -> Template 
         }
     }
 
-    Template::render("moment/create", context! {moment: moment.into_inner()})
+    let mut moment = moment.into_inner();
+    moment.created_at = Some(chrono::Local::now().to_rfc3339());
+
+    Template::render("moment/create", context! {moment: moment})
 }
 
 #[get("/")]
 async fn route_feed(mut db: Connection<Db>) -> Template {
-    let res = sqlx::query("select user_id, content from moments order by created_at desc")
+    let res = sqlx::query("select user_id, content, strftime('%FT%T', created_at) as created_at from moments order by created_at desc")
         .map(|row: sqlx::sqlite::SqliteRow| Moment {
             user_id: row.get::<i32, _>("user_id"),
             content: row.get::<String, _>("content"),
+            created_at: row.get::<Option<String>, _>("created_at"),
         })
         .fetch_all(&mut **db).await;
 
