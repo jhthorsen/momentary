@@ -1,7 +1,7 @@
 {% extends "base" %}
 
 {% block content %}
-<main role="document" class="m-container feed-document">
+<main role="document" class="document-width feed-document">
   <form action="/moment" method="POST"
     hx-post="/moment" hx-target="this" hx-swap="innerHTML">
     <input type="hidden" name="user_id" value="1">

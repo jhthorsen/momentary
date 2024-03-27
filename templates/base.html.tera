@@ -9,7 +9,7 @@
 <body>
   {% block header %}
   <header>
-    <div class="m-container">
+    <div class="document-width">
       <nav>
         <ul>
           <li><strong>Momentary</strong></li>
@@ -27,7 +27,7 @@
 
   {% block footer %}
   <footer>
-    <div class="m-container">
+    <div class="document-width">
       <p>&copy; 2024</p>
     </div>
   </footer>

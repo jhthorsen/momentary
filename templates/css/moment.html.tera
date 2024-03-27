@@ -1,4 +1,9 @@
 <style>
+:root {
+  --pico-form-element-spacing-vertical: 0.4em;
+  --pico-form-element-spacing-horizontal: 0.7em;
+}
+
 html, body {
   height: 100vh;
   margin: 0;
@@ -14,7 +19,7 @@ body {
   }
 }
 
-.m-container {
+.document-width {
   padding-inline: var(--pico-spacing);
   margin-inline: auto;
   width: 100%;
@@ -26,6 +31,10 @@ body {
     display: none;
   }
 
+  textarea {
+    height: 6em;
+  }
+
   @media (min-width: 50rem) {
     display: grid;
     grid-template-columns: 18rem 1fr;
@@ -34,11 +43,18 @@ body {
     h1 {
       display: none;
     }
+
+    > form {
+      align-self: start;
+      position: sticky;
+      top: var(--pico-spacing);
+    }
   }
 }
 
 .feed-moment {
   header {
+    background: transparent;
     margin-inline: 0;
     margin-block: var(--pico-block-spacing-vertical);
     padding: 0;
