@@ -57,6 +57,32 @@ async fn route_create(mut db: Connection<Db>, moment: Form<Moment>) -> Template 
     Template::render("moment/create", context! {moment: moment})
 }
 
+#[get("/<tag>")]
+async fn route_tag(mut db: Connection<Db>, tag: String) -> Template {
+    let kind = tag[0..1].to_string();
+    let name = tag[1..].to_string();
+    let res = sqlx::query("select user_id, content, strftime('%FT%T', created_at) as created_at
+            from moments
+            join moment_tags on moment_tags.moment_id = moments.id
+            where moment_tags.kind = ?
+              and moment_tags.name = ?
+            order by created_at desc"
+        )
+        .bind(kind).bind(name)
+        .map(|row: sqlx::sqlite::SqliteRow| Moment {
+            user_id: row.get::<i32, _>("user_id"),
+            content: row.get::<String, _>("content"),
+            created_at: row.get::<Option<String>, _>("created_at"),
+        })
+        .fetch_all(&mut **db).await;
+
+    if let Err(e) = res {
+        return Template::render("error", context! {error: e.to_string()});
+    }
+
+    Template::render("index", context! {moments: res.unwrap()})
+}
+
 #[get("/")]
 async fn route_feed(mut db: Connection<Db>) -> Template {
     let res = sqlx::query("select user_id, content, strftime('%FT%T', created_at) as created_at from moments order by created_at desc")
@@ -77,7 +103,9 @@ async fn route_feed(mut db: Connection<Db>) -> Template {
 fn template_filter_tags_to_links(value: &Value, _: &HashMap<String, Value>) -> Result<Value, Error> {
     let text = serde_json::from_value::<String>(value.clone()).unwrap();
     Ok(to_value(tag_re().replace_all(&text, |m: &Captures| {
-        format!("<a href=\"/tag/{}/{}\">{}{}</a>", m[1].to_string(), m[2].to_string(), m[1].to_string(), m[2].to_string())
+        format!("<a href=\"/{}\">{}</a>",
+            Regex::new(r"#").unwrap().replace(&mut m[0].to_string(), "%23"),
+            m[0].to_string())
     })).unwrap())
 }
 
@@ -102,5 +130,5 @@ fn rocket() -> _ {
         .attach(Template::custom(|engines| {
             engines.tera.register_filter("tags_to_links", template_filter_tags_to_links);
         }))
-        .mount("/", routes![route_feed, route_create])
+        .mount("/", routes![route_feed, route_create, route_tag])
 }
