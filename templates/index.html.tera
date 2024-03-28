@@ -2,11 +2,8 @@
 
 {% block content %}
 <main role="document" class="document-width feed-document">
-  <form action="/moment" method="POST"
-    hx-post="/moment" hx-target="this" hx-swap="innerHTML">
-    <input type="hidden" name="user_id" value="1">
-    <textarea name="content" placeholder="Today I..."></textarea>
-    <button>Post</button>
+  <form action="/moment" method="POST" hx-post="/moment" hx-target="this" hx-swap="innerHTML">
+    {% include "moment/form" %}
   </form>
 
   <div id="feed">
@@ -17,4 +14,70 @@
     {% endfor %}
   </div>
 </main>
+
+<script>
+(() => {
+  const $autocomplete_list = document.getElementById('content_autocomplete_list');
+
+  function getRelativeBoundingBox($el) {
+    const elRect = $el.getBoundingClientRect();
+    const parentRect = $el.parentNode.getBoundingClientRect();
+    const rect = {left: elRect.left - parentRect.left, top: elRect.top - parentRect.top}
+    rect.bottom = rect.top + elRect.height;
+    rect.right = rect.left + elRect.width;
+    return rect;
+  }
+
+  momentary.beforeAutocompleteTagsRequest = (event, $textarea) => {
+    const pos = momentary.findTagInTextArea($textarea);
+    if (!pos) {
+      $autocomplete_list.innerHTML = '';
+      return event.preventDefault();
+    }
+
+    const q = $textarea.value.substring(pos[0], pos[1]);
+    const b = $textarea.value.substring(0, pos[0]) + q;
+    event.detail.parameters = {q};
+
+    const $shadow = $textarea.parentNode.querySelector('.autocomplete-input-shadow');
+    $shadow.innerHTML
+      = '<span>'
+      + b.replace(/</g, '&nbsp;').trim().split(' ').join('</span> <span>')
+      + '</span>';
+
+    const rect = getRelativeBoundingBox($shadow.querySelector('span:last-child'));
+    $autocomplete_list.style.top = rect.bottom + 'px';
+    $autocomplete_list.style.left = rect.left + 'px';
+  };
+
+  momentary.findTagInTextArea = (el) => {
+    let [start, end] = [el.selectionStart, el.selectionEnd];
+    if (start !== end) return null;
+
+    end = el.value.indexOf(' ', end - 1);
+    if (end === -1) end = el.value.length;
+
+    start = el.value.lastIndexOf(' ', start - 1) + 1;
+    return /^[#@]/.test(el.value.substring(start, end)) ? [start, end] : null;
+  };
+
+  momentary.onClickAutocompleteTag = (event) => {
+    event.preventDefault();
+
+    const $link = event.target.closest('a');
+    if (!$link) return $autocomplete_list.innerHTML = '';
+
+    const tag = $link.href.replace(/.*#autocomplete:/, '') + ' ';
+
+    const $textarea = $link.closest('form').querySelector('[name=content]');
+    const pos = momentary.findTagInTextArea($textarea);
+    if (!pos) return console.error('Unable to find tag in textarea!', $textarea, $link);
+
+    $autocomplete_list.innerHTML = '';
+    $textarea.value = $textarea.value.substring(0, pos[0]) + tag + $textarea.value.substring(pos[1]);
+    $textarea.focus();
+    $textarea.selectionEnd = pos[0] + tag.length + 1;
+  };
+})();
+</script>
 {% endblock %}

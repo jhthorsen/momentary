@@ -1,0 +1,59 @@
+<style>
+:root {
+  --pico-form-element-spacing-vertical: 0.4em;
+  --pico-form-element-spacing-horizontal: 0.7em;
+}
+
+html, body {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+
+  & > main {
+    flex: 1;
+  }
+}
+
+.autocomplete-wrapper {
+  position: relative;
+}
+
+.autocomplete-input-shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
+}
+
+.autocomplete-list {
+  --pico-background-color: var(--pico-form-element-background-color);
+  --pico-border-color: var(--pico-form-element-border-color);
+  --pico-color: var(--pico-form-element-color);
+  --pico-box-shadow: none;
+  font-weight: var(--pico-font-weight);
+  background-color: var(--pico-background-color);
+  color: var(--pico-color);
+  border: var(--pico-border-width) solid var(--pico-border-color);
+  border-radius: var(--pico-border-radius);
+  margin: var(--pico-form-element-spacing-vertical) 0;
+  padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
+  box-shadow: var(--pico-box-shadow);
+  transition: background-color var(--pico-transition),border-color var(--pico-transition),color var(--pico-transition),box-shadow var(--pico-transition);
+  position: absolute;
+
+  &:empty {
+    display: none;
+  }
+
+  li {
+    list-style: none;
+  }
+}
+</style>

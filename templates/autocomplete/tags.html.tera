@@ -1,0 +1,3 @@
+{% for tag in tags %}
+<li><a href="#autocomplete:{{ tag | escape }}">{{ tag }}</a></li>
+{% endfor %}

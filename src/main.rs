@@ -57,6 +57,27 @@ async fn route_create(mut db: Connection<Db>, moment: Form<Moment>) -> Template 
     Template::render("moment/create", context! {moment: moment})
 }
 
+#[get("/-/tags?<q>")]
+async fn route_autocomplete_tags(mut db: Connection<Db>, q: String) -> Template {
+    let kind = q[0..1].to_string();
+    let name = format!("{}%", q[1..].to_string());
+    let res = sqlx::query("select kind, name
+            from moment_tags
+            where kind = ? and name like ?
+            group by kind, name
+            limit 10"
+        )
+        .bind(kind).bind(name)
+        .map(|row: sqlx::sqlite::SqliteRow| format!("{}{}", row.get::<String, _>("kind"), row.get::<String, _>("name")))
+        .fetch_all(&mut **db).await;
+
+    if let Err(e) = res {
+        return Template::render("error", context! {error: e.to_string()});
+    }
+
+    Template::render("autocomplete/tags", context! {tags: res.unwrap()})
+}
+
 #[get("/<tag>")]
 async fn route_tag(mut db: Connection<Db>, tag: String) -> Template {
     let kind = tag[0..1].to_string();
@@ -130,5 +151,5 @@ fn rocket() -> _ {
         .attach(Template::custom(|engines| {
             engines.tera.register_filter("tags_to_links", template_filter_tags_to_links);
         }))
-        .mount("/", routes![route_feed, route_create, route_tag])
+        .mount("/", routes![route_feed, route_create, route_tag, route_autocomplete_tags])
 }

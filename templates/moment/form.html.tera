@@ -1,0 +1,13 @@
+<input type="hidden" name="user_id" value="1">
+<div class="autocomplete-wrapper">
+  <textarea name="content" placeholder="Today I..."
+    hx-on:click="momentary.onClickAutocompleteTag(event)"
+    hx-get="/-/tags"
+    hx-on::config-request="momentary.beforeAutocompleteTagsRequest(event, this)"
+    hx-trigger="keyup changed delay:300ms"
+    hx-target="#content_autocomplete_list"></textarea>
+  <div class="autocomplete-input-shadow"></div>
+  <ul id="content_autocomplete_list" class="autocomplete-list"
+    hx-on:click="momentary.onClickAutocompleteTag(event)"></ul>
+</div>
+<button>Post</button>

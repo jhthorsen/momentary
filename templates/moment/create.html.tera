@@ -1,6 +1,4 @@
-<input type="hidden" name="user_id" value="{{ moment.user_id }}">
-<textarea name="content" placeholder="Today I..."></textarea>
-<button>Post</button>
+{% include "moment/form" %}
 
 <div hx-swap-oob="afterend: #feed .htmx-insert-after">
   {% include "moment/article" %}

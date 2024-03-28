@@ -1,24 +1,4 @@
 <style>
-:root {
-  --pico-form-element-spacing-vertical: 0.4em;
-  --pico-form-element-spacing-horizontal: 0.7em;
-}
-
-html, body {
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  display: flex;
-  flex-direction: column;
-
-  & > main {
-    flex: 1;
-  }
-}
-
 .document-width {
   padding-inline: var(--pico-spacing);
   margin-inline: auto;
