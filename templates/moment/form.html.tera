@@ -1,6 +1,7 @@
 <input type="hidden" name="user_id" value="1">
 <div class="autocomplete-wrapper">
   <textarea name="content" placeholder="Today I..."
+    hx-ext="local-storage"
     hx-on:click="momentary.onClickAutocompleteTag(event)"
     hx-get="/-/tags"
     hx-on::config-request="momentary.beforeAutocompleteTagsRequest(event, this)"

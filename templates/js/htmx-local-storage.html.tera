@@ -1,0 +1,14 @@
+<script>
+(() => {
+  htmx.defineExtension('local-storage', {
+    onEvent: (name, event) => {
+      if (name === 'htmx:beforeProcessNode') {
+        const $el = event.detail.elt;
+        const itemName = 'momentary:form:value:' + $el.name;
+        $el.addEventListener('input', () => localStorage.setItem(itemName, $el.value));
+        $el.value = localStorage.getItem(itemName) ?? '';
+      }
+    },
+  });
+})();
+</script>
