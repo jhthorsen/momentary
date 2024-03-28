@@ -1,0 +1,11 @@
+<script>
+window.momentary = {};
+momentary.getRelativeBoundingBox = ($el) => {
+  const elRect = $el.getBoundingClientRect();
+  const parentRect = $el.parentNode.getBoundingClientRect();
+  const rect = {left: elRect.left - parentRect.left, top: elRect.top - parentRect.top}
+  rect.bottom = rect.top + elRect.height;
+  rect.right = rect.left + elRect.width;
+  return rect;
+};
+</script>

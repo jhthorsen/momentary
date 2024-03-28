@@ -3,6 +3,7 @@
 use rocket::{Build, Rocket};
 use rocket::fairing::{self, AdHoc};
 use rocket::form::Form;
+use rocket::request::{self, Outcome, Request, FromRequest};
 use rocket_db_pools::{sqlx, Connection, Database};
 use rocket_db_pools::sqlx::Row;
 use rocket_dyn_templates::{Template, context};
@@ -25,18 +26,48 @@ struct Moment {
     created_at: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+struct HtmxRequest {
+    boosted: bool,
+    current_url: String,
+    history_restore_request: bool,
+    request: bool,
+    target: String,
+    trigger: String,
+    trigger_name: String,
+}
+
 fn tag_re() -> regex::Regex {
     Regex::new(r"(\#|@)([a-zA-Z][0-9a-zA-Z_]+)").unwrap()
 }
 
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for HtmxRequest {
+    type Error = ();
+
+    async fn from_request(request: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
+        let headers = request.headers();
+
+        Outcome::Success(HtmxRequest {
+            boosted: headers.get_one("HX-Boosted").is_some(),
+            current_url: request.uri().to_string(),
+            history_restore_request: headers.get_one("HX-History-Restore-Request").is_some(),
+            request: headers.get_one("HX-Request").is_some(),
+            target: headers.get_one("HX-Target").unwrap_or("").to_string(),
+            trigger: headers.get_one("HX-Trigger").unwrap_or("").to_string(),
+            trigger_name: headers.get_one("HX-Trigger-Name").unwrap_or("").to_string(),
+        })
+    }
+}
+
 #[post("/moment", data = "<moment>")]
-async fn route_create(mut db: Connection<Db>, moment: Form<Moment>) -> Template {
+async fn route_create(mut db: Connection<Db>, moment: Form<Moment>, htmx: HtmxRequest) -> Template {
     let res = sqlx::query("insert into moments (user_id, content) values (?, ?)")
         .bind(moment.user_id).bind(moment.content.clone())
         .execute(&mut **db).await;
 
     if let Err(e) = res {
-        return Template::render("error", context! {error: e.to_string()});
+        return Template::render("error", context! {htmx, error: e.to_string()});
     }
 
     let moment_id = res.unwrap().last_insert_rowid();
@@ -47,18 +78,18 @@ async fn route_create(mut db: Connection<Db>, moment: Form<Moment>) -> Template 
             .execute(&mut **db).await;
 
         if let Err(e) = res {
-            return Template::render("error", context! {error: e.to_string()});
+            return Template::render("error", context! {htmx, error: e.to_string()});
         }
     }
 
     let mut moment = moment.into_inner();
     moment.created_at = Some(chrono::Local::now().to_rfc3339());
 
-    Template::render("moment/create", context! {moment: moment})
+    Template::render("moment/create", context! {htmx, moment: moment})
 }
 
 #[get("/-/tags?<q>")]
-async fn route_autocomplete_tags(mut db: Connection<Db>, q: String) -> Template {
+async fn route_autocomplete_tags(mut db: Connection<Db>, q: String, htmx: HtmxRequest) -> Template {
     let kind = q[0..1].to_string();
     let name = format!("{}%", q[1..].to_string());
     let res = sqlx::query("select kind, name
@@ -72,14 +103,14 @@ async fn route_autocomplete_tags(mut db: Connection<Db>, q: String) -> Template 
         .fetch_all(&mut **db).await;
 
     if let Err(e) = res {
-        return Template::render("error", context! {error: e.to_string()});
+        return Template::render("error", context! {htmx, error: e.to_string()});
     }
 
-    Template::render("autocomplete/tags", context! {tags: res.unwrap()})
+    Template::render("autocomplete/tags", context! {htmx, tags: res.unwrap()})
 }
 
 #[get("/<tag>")]
-async fn route_tag(mut db: Connection<Db>, tag: String) -> Template {
+async fn route_tag(mut db: Connection<Db>, tag: String, htmx: HtmxRequest) -> Template {
     let kind = tag[0..1].to_string();
     let name = tag[1..].to_string();
     let res = sqlx::query("select user_id, content, strftime('%FT%T', created_at) as created_at
@@ -98,14 +129,14 @@ async fn route_tag(mut db: Connection<Db>, tag: String) -> Template {
         .fetch_all(&mut **db).await;
 
     if let Err(e) = res {
-        return Template::render("error", context! {error: e.to_string()});
+        return Template::render("error", context! {htmx, error: e.to_string()});
     }
 
-    Template::render("index", context! {moments: res.unwrap()})
+    Template::render("index", context! {htmx: htmx, moments: res.unwrap()})
 }
 
 #[get("/")]
-async fn route_feed(mut db: Connection<Db>) -> Template {
+async fn route_feed(mut db: Connection<Db>, htmx: HtmxRequest) -> Template {
     let res = sqlx::query("select user_id, content, strftime('%FT%T', created_at) as created_at from moments order by created_at desc")
         .map(|row: sqlx::sqlite::SqliteRow| Moment {
             user_id: row.get::<i32, _>("user_id"),
@@ -115,10 +146,10 @@ async fn route_feed(mut db: Connection<Db>) -> Template {
         .fetch_all(&mut **db).await;
 
     if let Err(e) = res {
-        return Template::render("error", context! {error: e.to_string()});
+        return Template::render("error", context! {htmx, error: e.to_string()});
     }
 
-    Template::render("index", context! {moments: res.unwrap()})
+    Template::render("index", context! {htmx, moments: res.unwrap()})
 }
 
 fn template_filter_tags_to_links(value: &Value, _: &HashMap<String, Value>) -> Result<Value, Error> {

@@ -1,3 +1,4 @@
+{% if not htmx.boosted %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,34 +6,42 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.pumpkin.min.css">
   {% include "css/base" %}
   {% include "css/moment" %}
-  <script>window.momentary = {}</script>
+  {% include "js/utils" %}
   {% block head %}{% endblock %}
 </head>
 <body>
+{% endif %}
+{% if htmx.boosted %}
+  <header id="header" hx-preserve="true"></header>
+{% else %}
   {% block header %}
-  <header>
-    <div class="document-width">
-      <nav>
-        <ul>
-          <li><strong>Momentary</strong></li>
-          <li><a href="/">Feed</a></li>
-        </ul>
-        <ul>
-          <li><a href="/-/account">Account</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+    <header id="header">
+      <div class="document-width" hx-boost="true">
+        <nav>
+          <ul>
+            <li><strong>Momentary</strong></li>
+            <li><a href="/">Feed</a></li>
+          </ul>
+          <ul>
+            <li><a href="/-/account">Account</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
   {% endblock %}
+{% endif %}
 
   {% block content %}<p>content missing!</p>{% endblock %}
 
+{% if htmx.boosted %}
+  <footer id="footer" hx-preserve="true"></footer>
+{% else %}
   {% block footer %}
-  <footer>
-    <div class="document-width">
-      <p>&copy; 2024</p>
-    </div>
-  </footer>
+    <footer id="footer">
+      <div class="document-width">
+        <p>&copy; 2024</p>
+      </div>
+    </footer>
   {% endblock %}
 
   <script src="https://unpkg.com/htmx.org@1.9.6"
@@ -40,3 +49,4 @@
     crossorigin="anonymous"></script>
 </body>
 </html>
+{% endif %}
