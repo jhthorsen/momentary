@@ -4,6 +4,16 @@
   --pico-form-element-spacing-horizontal: 0.7em;
 }
 
+@media only screen and (prefers-color-scheme:dark) {
+  :root:not([data-theme=light]) {
+    --pico-dropdown-background-color: #302f35;
+    --pico-form-element-active-background-color: #252225;
+  }
+}
+
+:root:not([data-theme=dark]), [data-theme=light] {
+}
+
 html, body {
   height: 100vh;
   margin: 0;
@@ -32,27 +42,42 @@ body {
   padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
 }
 
-.autocomplete-list {
-  --pico-background-color: var(--pico-form-element-background-color);
-  --pico-border-color: var(--pico-form-element-border-color);
-  --pico-color: var(--pico-form-element-color);
-  --pico-box-shadow: none;
-  font-weight: var(--pico-font-weight);
-  background-color: var(--pico-background-color);
-  color: var(--pico-color);
-  border: var(--pico-border-width) solid var(--pico-border-color);
+.autocomplete-dropdown {
+  background-color: var(--pico-dropdown-background-color);
+  color: var(--pico-dropdown-color);
+  white-space: nowrap;
+  border: var(--pico-border-width) solid var(--pico-dropdown-border-color);
   border-radius: var(--pico-border-radius);
-  margin: var(--pico-form-element-spacing-vertical) 0;
-  padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
-  box-shadow: var(--pico-box-shadow);
-  transition: background-color var(--pico-transition),border-color var(--pico-transition),color var(--pico-transition),box-shadow var(--pico-transition);
+  box-shadow: var(--pico-dropdown-box-shadow);
+  margin: 0;
+  margin-top: var(--pico-outline-width);
+  padding: 0;
+  min-width: 10em;
+  opacity: 1;
+  transition: opacity var(--pico-transition),transform 0s ease-in-out 1s;
   position: absolute;
+  z-index: 99;
 
   &:empty {
-    display: none;
+    opacity: 0;
+  }
+
+  a {
+    color: var(--pico-dropdown-color);
+    text-decoration: none;
+    text-overflow: ellipsis;
+    padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
+    display: block;
+    overflow: hidden;
+
+    &:focus,
+    &:hover {
+      background-color: var(--pico-dropdown-hover-background-color);
+    }
   }
 
   li {
+    margin: 0;
     list-style: none;
   }
 }

@@ -1,0 +1,71 @@
+<script>
+(() => {
+  function autocompleteItemClick(event, {$autocomplete_list, $input}) {
+    event.preventDefault();
+    const {href} = event.target.closest('a') || {href: ''};
+    if (!href) return $autocomplete_list.innerHTML = '';
+
+    const tag = href.replace(/.*#autocomplete:/, '') + ' ';
+    const pos = findTagPosition($input);
+    if (!pos) return;
+
+    $autocomplete_list.innerHTML = '';
+    $input.value = $input.value.substring(0, pos[0]) + tag + $input.value.substring(pos[1]);
+    $input.focus();
+    $input.selectionEnd = pos[0] + tag.length + 1;
+  }
+
+  function configRequest(event, {$autocomplete_list, $input, $shadow}) {
+    const pos = findTagPosition($input);
+    if (!pos) {
+      $autocomplete_list.innerHTML = '';
+      return event.preventDefault();
+    }
+
+    const q = $input.value.substring(pos[0], pos[1]);
+    const b = $input.value.substring(0, pos[0]) + q;
+    $shadow.innerHTML = '<span>' + b.replace(/</g, '&nbsp;').trim().split(' ').join('</span> <span>') + '</span>';
+    event.detail.parameters = {q};
+
+    const rect = momentary.getRelativeBoundingBox($shadow.querySelector('span:last-child'));
+    $autocomplete_list.style.top = rect.bottom + 'px';
+    $autocomplete_list.style.left = rect.left + 'px';
+  }
+
+  function findTagPosition($el, re = /^[#@]/) {
+    let [start, end] = [$el.selectionStart, $el.selectionEnd];
+    if (start !== end) return null;
+
+    end = $el.value.indexOf(' ', end - 1);
+    if (end === -1) end = $el.value.length;
+    start = $el.value.lastIndexOf(' ', start - 1) + 1;
+    return re.test($el.value.substring(start, end)) ? [start, end] : null;
+  }
+
+  function inputKeyDown(event, {$autocomplete_list}) {
+    const $a = event.key === 'Enter' && $autocomplete_list.querySelector('a');
+    if ($a) event.preventDefault(), $a.click();
+  }
+
+  htmx.defineExtension('autocomplete', {
+    onEvent: (name, event) => {
+      const $wrapper = event.detail.elt;
+      if (name !== 'htmx:beforeProcessNode') return;
+      if (!$wrapper || $wrapper.getAttribute('hx-ext') !== 'autocomplete') return;
+
+      const $autocomplete_list = $wrapper.querySelector('.autocomplete-dropdown');
+      const $input = $wrapper.querySelector('input, textarea');
+      const $shadow = $wrapper.querySelector('.autocomplete-input-shadow');
+
+      $autocomplete_list.addEventListener('click',
+        (event) => autocompleteItemClick(event, {$autocomplete_list, $input}));
+      $input.addEventListener('blur',
+        (_event) => setTimeout(() => { $autocomplete_list.innerHTML = '' }, 100));
+      $input.addEventListener('htmx:config-request',
+        (event) => configRequest(event, {$autocomplete_list, $input, $shadow}));
+      $input.addEventListener('keydown',
+        (event) => inputKeyDown(event, {$autocomplete_list}));
+    },
+  });
+})();
+</script>
