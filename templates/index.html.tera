@@ -2,16 +2,18 @@
 
 {% block content %}
 <main role="document" class="document-width feed-document">
-  <form id="moment_form" action="/moment" method="POST" hx-post="/moment" hx-target="this" hx-swap="innerHTML">
-    {% include "moment/form" %}
-  </form>
+  <section>
+    <form id="moment_form" action="/moment" method="POST" hx-post="/moment" hx-target="this" hx-swap="innerHTML">
+      {% include "moment/form" %}
+    </form>
+  </section>
 
-  <div id="feed">
+  <section id="feed">
     <h1>Feed</h1>
     <hr class="htmx-insert-after">
     {% for moment in moments %}
       {% include "moment/article" %}
     {% endfor %}
-  </div>
+  </section>
 </main>
 {% endblock %}
