@@ -29,56 +29,11 @@ body {
   }
 }
 
-.autocomplete-wrapper {
-  position: relative;
+.document-width {
+  padding-inline: var(--pico-spacing);
+  margin-inline: auto;
+  width: 100%;
+  max-width: 60rem;
 }
 
-.autocomplete-input-shadow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  pointer-events: none;
-  padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
-}
-
-.autocomplete-dropdown {
-  background-color: var(--pico-dropdown-background-color);
-  color: var(--pico-dropdown-color);
-  white-space: nowrap;
-  border: var(--pico-border-width) solid var(--pico-dropdown-border-color);
-  border-radius: var(--pico-border-radius);
-  box-shadow: var(--pico-dropdown-box-shadow);
-  margin: 0;
-  margin-top: var(--pico-outline-width);
-  padding: 0;
-  min-width: 10em;
-  opacity: 1;
-  transition: opacity var(--pico-transition),transform 0s ease-in-out 1s;
-  position: absolute;
-  z-index: 99;
-
-  &:empty {
-    opacity: 0;
-  }
-
-  a {
-    color: var(--pico-dropdown-color);
-    text-decoration: none;
-    text-overflow: ellipsis;
-    padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
-    display: block;
-    overflow: hidden;
-
-    &:focus,
-    &:hover {
-      background-color: var(--pico-dropdown-hover-background-color);
-    }
-  }
-
-  li {
-    margin: 0;
-    list-style: none;
-  }
-}
 </style>

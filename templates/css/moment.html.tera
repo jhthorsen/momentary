@@ -1,18 +1,11 @@
 <style>
-.document-width {
-  padding-inline: var(--pico-spacing);
-  margin-inline: auto;
-  width: 100%;
-  max-width: 60rem;
-}
-
 .feed-document {
-  .htmx-insert-after {
-    display: none;
+  #moment_form textarea {
+    height: 6em;
   }
 
-  textarea {
-    height: 6em;
+  .htmx-insert-after {
+    display: none;
   }
 
   @media (min-width: 50rem) {
@@ -24,7 +17,7 @@
       display: none;
     }
 
-    > form {
+    #moment_form {
       align-self: start;
       position: sticky;
       top: var(--pico-spacing);
