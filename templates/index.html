@@ -1,10 +1,10 @@
-{% extends "base" %}
+{% extends "base.html" %}
 
 {% block content %}
 <main role="document" class="document-width feed-document">
   <section>
     <form id="moment_form" action="/moment" method="POST" hx-post="/moment" hx-target="this" hx-swap="innerHTML">
-      {% include "moment/form" %}
+      {% include "moment/form.html" %}
     </form>
   </section>
 
@@ -12,7 +12,7 @@
     <h1>Feed</h1>
     <hr class="htmx-insert-after">
     {% for moment in moments %}
-      {% include "moment/article" %}
+      {% include "moment/article.html" %}
     {% endfor %}
   </section>
 </main>
