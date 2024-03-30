@@ -1,5 +1,0 @@
-{% include "moment/form" %}
-
-<div hx-swap-oob="afterend: #feed .htmx-insert-after">
-  {% include "moment/article" %}
-</div>

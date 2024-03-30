@@ -7,10 +7,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.pumpkin.min.css">
-  {% include "css/base" %}
-  {% include "css/autocomplete" %}
-  {% include "css/moment" %}
-  {% include "js/utils" %}
+  {% include "css/base.html" %}
+  {% include "css/autocomplete.html" %}
+  {% include "css/moment.html" %}
+  {% include "js/utils.html" %}
   {% block head %}{% endblock %}
 </head>
 <body>
@@ -51,8 +51,8 @@
   <script src="https://unpkg.com/htmx.org@1.9.6"
     integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
     crossorigin="anonymous"></script>
-  {% include "js/htmx-autocomplete" %}
-  {% include "js/htmx-local-storage" %}
+  {% include "js/htmx-autocomplete.html" %}
+  {% include "js/htmx-local-storage.html" %}
 </body>
 </html>
 {% endif %}
