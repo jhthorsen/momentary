@@ -1,27 +1,17 @@
 use actix_web::{get, post, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
-use actix_web::http::header::HeaderValue;
 use chrono;
-use regex::{Captures, Regex};
+use regex::Regex;
 use serde::{Serialize, Deserialize};
-use serde_json::value::to_value;
 use sqlx::Row;
 use sqlx::sqlite::{SqlitePool, SqlitePoolOptions};
-use std::collections::HashMap;
-use tera::{Context, Error, Tera, Value};
+use tera::Tera;
+
+mod template;
+use crate::template::{build_tera, template_context};
 
 pub struct AppState {
     db: SqlitePool,
     tera: Tera,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct HtmxHeaders {
-    boosted: bool,
-    history_restore_request: bool,
-    request: bool,
-    target: String,
-    trigger: String,
-    trigger_name: String,
 }
 
 #[derive(Deserialize)]
@@ -34,25 +24,6 @@ struct Moment {
     user_id: i32,
     content: String,
     created_at: Option<String>,
-}
-
-fn header_value_to_string(value: Option<&HeaderValue>) -> String {
-    value.unwrap_or(&HeaderValue::from_static("")).to_str().unwrap_or_default().to_string()
-}
-
-fn template_context(req: HttpRequest) -> Context {
-    let mut ctx = Context::new();
-    let h = req.headers();
-    ctx.insert("htmx", &HtmxHeaders {
-        boosted: h.get("HX-Boosted").is_some(),
-        history_restore_request: h.get("HX-History-Restore-Request").is_some(),
-        request: h.get("HX-Request").is_some(),
-        target: header_value_to_string(h.get("HX-Target")),
-        trigger: header_value_to_string(h.get("HX-Trigger")),
-        trigger_name: header_value_to_string(h.get("HX-Trigger-Name")),
-    });
-
-    ctx
 }
 
 #[post("/moment")]
@@ -168,15 +139,6 @@ fn tag_re() -> regex::Regex {
     Regex::new(r"(\#|@)([a-zA-Z][0-9a-zA-Z_]+)").unwrap()
 }
 
-fn template_filter_tags_to_links(value: &Value, _: &HashMap<String, Value>) -> Result<Value, Error> {
-    let text = serde_json::from_value::<String>(value.clone()).unwrap();
-    Ok(to_value(tag_re().replace_all(&text, |m: &Captures| {
-        format!("<a href=\"/{}\">{}</a>",
-            Regex::new(r"#").unwrap().replace(&mut m[0].to_string(), "%23"),
-            m[0].to_string())
-    })).unwrap())
-}
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let database_url = std::env::var("DATABASE_URL").unwrap_or("sqlite::memory:".to_string());
@@ -186,19 +148,12 @@ async fn main() -> std::io::Result<()> {
         Err(err) => { println!("🔥 Failed to connect to the database {}: {:?}", database_url, err); std::process::exit(1); }
     };
 
-    let mut tera = match Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*")) {
-        Ok(tera) => tera,
-        Err(err) => { println!("🔥 Failed to initialize Tera: {:?}", err); std::process::exit(1); }
-    };
-
-    tera.register_filter("tags_to_links", template_filter_tags_to_links);
-
     let port :u16 = std::env::var("PORT").unwrap_or("8000".to_string()).parse().unwrap();
     println!("🚀 Listening to http://127.0.0.1:{}/ ...", port);
 
     HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(AppState {db: pool.clone(), tera: tera.clone()}))
+            .app_data(web::Data::new(AppState {db: pool.clone(), tera: build_tera().clone()}))
             .service(route_autocomplete_tags)
             .service(route_create)
             .service(route_feed)
