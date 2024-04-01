@@ -57,10 +57,17 @@
       const $input = $wrapper.querySelector('input, textarea');
       const $shadow = $wrapper.querySelector('.autocomplete-input-shadow');
 
+      let isOpen = false;
+      for (const $el of [$autocomplete_list, $input]) {
+        $el.addEventListener('focusin', (_event) => { isOpen = true });
+        $el.addEventListener('focusout', (_event) => {
+          isOpen = false;
+          setTimeout(() => { if (!isOpen) $autocomplete_list.innerHTML = '' }, 200);
+        });
+      }
+
       $autocomplete_list.addEventListener('click',
         (event) => autocompleteItemClick(event, {$autocomplete_list, $input}));
-      $input.addEventListener('blur',
-        (_event) => setTimeout(() => { $autocomplete_list.innerHTML = '' }, 100));
       $input.addEventListener('htmx:config-request',
         (event) => configRequest(event, {$autocomplete_list, $input, $shadow}));
       $input.addEventListener('keydown',
