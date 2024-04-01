@@ -5,6 +5,7 @@
       if (name === 'htmx:beforeProcessNode') {
         const $el = event.detail.elt;
         const itemName = 'momentary:form:value:' + $el.name;
+        $el.closest('form').addEventListener('submit', () => localStorage.removeItem(itemName));
         $el.addEventListener('input', () => localStorage.setItem(itemName, $el.value));
         $el.value = localStorage.getItem(itemName) ?? '';
       }
